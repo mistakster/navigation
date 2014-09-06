@@ -1,0 +1,29 @@
+{
+  "name": "shower-navigation",
+  "description": "Navigation plugin for Shower HTML presentation engine",
+  "version": "0.0.1",
+  "author": {
+    "name": "Vadim Makeev",
+    "url": "http://pepelsbey.com/"
+  },
+  "homepage": "https://github.com/shower/navigation",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shower/navigation.git"
+  },
+  "bugs": {
+    "url": "http://github.com/shower/shower/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/shower/shower/wiki/MIT-License"
+    }
+  ],
+  "keywords": [
+    "shower",
+    "presentation",
+    "plugin",
+    "navigation"
+  ]
+}

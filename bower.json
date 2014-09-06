@@ -1,0 +1,19 @@
+{
+  "name": "shower-navigation",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "plugin.Navigation.js",
+  "ignore": [
+    "*",
+    "!License.md",
+    "!Readme.md",
+    "!plugin.Navigation.js",
+    "!bower.json"
+  ],
+  "keywords": [
+    "shower",
+    "presentation",
+    "plugin",
+    "navigation"
+  ]
+}

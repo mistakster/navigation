@@ -96,7 +96,7 @@ modules.define('plugin.Navigation', [
                 .on('activate', this._onSlideActivate, this)
                 .on('next', this._onNext, this)
                 // Support timing plugin.
-                .on('plugintimingnext', this._onPluginTimingNext, this);
+                .on('plugintimernext', this._onPluginTimerNext, this);
         },
 
         _clearListeners: function () {
@@ -112,7 +112,7 @@ modules.define('plugin.Navigation', [
             }
         },
 
-        _onPluginTimingNext: function (e) {
+        _onPluginTimerNext: function (e) {
             if (this._elements.length) {
                 e.preventDefault();
                 this._shower.next();

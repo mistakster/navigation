@@ -106,7 +106,7 @@ modules.define('plugin.Navigation', [
 
         _onNext: function (e) {
             var elementsLength = this._elements.length;
-            if (elementsLength && this._innerComplete < elementsLength) {
+            if (this._shower.container.isSlideMode() && elementsLength && this._innerComplete < elementsLength) {
                 e.preventDefault();
                 this.next();
             }

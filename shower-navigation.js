@@ -1,16 +1,8 @@
 /**
  * @fileOverview
  * Inner navigation shower plugin.
- *
- * @example
- * modules.require(['shower', 'plugin.Navigation'], function (shower, Navigation) {
- *     shower.ready(function () {
- *          var navigation = new Navigation(shower, '.next');
- *          console.log(navigation.getInnerLength() + " inner items");
- *     });
- * });
  */
-modules.define('plugin.Navigation', [
+modules.define('shower-navigation', [
     'util.extend'
 ], function (provide, extend) {
 
@@ -137,4 +129,8 @@ modules.define('plugin.Navigation', [
     });
 
     provide(Navigation);
+});
+
+modules.require(['shower'], function (shower) {
+    shower.plugins.add('shower-navigation');
 });

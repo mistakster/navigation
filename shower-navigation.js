@@ -3,8 +3,12 @@
  * Inner navigation shower plugin.
  */
 modules.define('shower-navigation', [
-    'util.extend'
-], function (provide, extend) {
+    'event.Emitter',
+    'util.extend',
+    'util.bind'
+], function (provide, EventEmitter, extend, bind) {
+
+    var timerPluginName = 'shower-timer';
 
     /**
      * @class
@@ -16,13 +20,13 @@ modules.define('shower-navigation', [
      */
     function Navigation (shower, options) {
         options = options || {};
+        this.events = new EventEmitter();
 
         this._shower = shower;
         this._elementsSelector = options.selector || '.next';
         this._elements = [];
 
         this._innerComplete = 0;
-        this.init();
     }
 
     extend(Navigation.prototype, /** @lends plugin.Navigation.prototype */{
@@ -53,47 +57,78 @@ modules.define('shower-navigation', [
             }
 
             this._innerComplete++;
-            
-            for (var i = 0, k = this._elements.length; i < k; i++) {
-                var element = this._elements[i];
+            this._go();
 
-                if (i < this._innerComplete) {
-                    element.classList.add('active');
-                } else {
-                    element.classList.remove('active');
-                }
-            }
+            this.events.emit('prev');
+            return this;
+        },
+
+        prev: function () {
+            this._innerComplete--;
+            this._go();
+
+            this.events.emit('next');
             return this;
         },
 
         /**
          * @returns {Number} Inner elements count.
          */
-        getInnerLength: function () {
+        getLength: function () {
+            this._elements = this._getElements();
             return this._elements.length;
         },
 
         /**
          * @returns {Number} Completed inner elements count.
          */
-        getInnerComplete: function () {
+        getComplete: function () {
             return this._innerComplete;
         },
 
         _setupListeners: function () {
-            this._showerListeners = this._shower.events.group()
+            var shower = this._shower;
+
+            this._showerListeners = shower.events.group()
                 .on('destroy', this.destroy, this);
 
-            this._playerListeners = this._shower.player.events.group()
+            this._playerListeners = shower.player.events.group()
                 .on('activate', this._onSlideActivate, this)
                 .on('next', this._onNext, this)
-                // Support timing plugin.
-                .on('plugintimernext', this._onPluginTimerNext, this);
+                .on('prev', this._onPrev, this);
+
+            var timerPlugin = shower.plugins.get(timerPluginName);
+            if (timerPlugin) {
+                this._setupTimerPluginListener(timerPlugin);
+            } else {
+                this._pluginsListeners = shower.plugins.events.group()
+                    .on('pluginadd', function (e) {
+                        if (e.get('name') == timerPluginName) {
+                            this._setupTimerPluginListener();
+                            this._pluginsListeners.offAll();
+                        }
+                    }, this);
+            }
+        },
+
+        _setupTimerPluginListener: function (plugin) {
+            if (!plugin) {
+                plugin = shower.plugins.get(timerPluginName);
+            }
+            plugin.events
+                .on('next', this._onNext, this);
         },
 
         _clearListeners: function () {
             this._showerListeners.offAll();
             this._playerListeners.offAll();
+        },
+
+        _getElements: function () {
+            var slideLayout = this._shower.player.getCurrentSlide().getLayout(),
+                slideElement = slideLayout.getElement();
+
+            return slideElement.querySelectorAll(this._elementsSelector);
         },
 
         _onNext: function (e) {
@@ -104,18 +139,30 @@ modules.define('shower-navigation', [
             }
         },
 
-        _onPluginTimerNext: function (e) {
-            if (this._elements.length) {
+        _onPrev: function (e) { 
+            var elementsLength = this._elements.length,
+                isSlideMode = this._shower.container.isSlideMode();
+
+            if (elementsLength && this._innerComplete < elementsLength && this._innerComplete > 0) {
                 e.preventDefault();
-                this._shower.next();
+                this.prev();
+            }
+        },
+
+        _go: function () {
+            for (var i = 0, k = this._elements.length; i < k; i++) {
+                var element = this._elements[i];
+
+                if (i < this._innerComplete) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
             }
         },
 
         _onSlideActivate: function () {
-            var slideLayout = this._shower.player.getCurrentSlide().getLayout(),
-                slideElement = slideLayout.getElement();
-
-            this._elements = slideElement.querySelectorAll(this._elementsSelector);
+            this._elements = this._getElements();
             this._elements = Array.prototype.slice.call(this._elements);
 
             this._innerComplete = this._getInnerComplete();

@@ -59,7 +59,7 @@ modules.define('shower-navigation', [
             this._innerComplete++;
             this._go();
 
-            this.events.emit('prev');
+            this.events.emit('next');
             return this;
         },
 
@@ -67,7 +67,7 @@ modules.define('shower-navigation', [
             this._innerComplete--;
             this._go();
 
-            this.events.emit('next');
+            this.events.emit('prev');
             return this;
         },
 
